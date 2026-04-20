@@ -35,6 +35,11 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5' // 버전은 Auth Service와 동일
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    // Spring Cloud LoadBalancer
+    implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
+
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.4.0'
 }
 
 dependencyManagement {

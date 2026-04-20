@@ -9,9 +9,22 @@ spring:
       routes:
         # Auth Service
         - id: auth-service
+          # 기존 고정 주소 (현재 사용 중)
           uri: http://localhost:8081
+
+#          # [서버 늘린 후] Load Balancer 프로토콜 적용
+#          uri: lb://AUTH-SERVICE
+
           predicates:
             - Path=/api/v1/auth/**
+
+        # Auth Service의 '스웨거 설명서 데이터'를 가져오기 위한 추가
+        - id: auth-service-swagger
+          uri: http://localhost:8081
+          predicates:
+            - Path=/v3/api-docs/auth # 이 주소로 요청이 오면
+          filters:
+              - RewritePath=/v3/api-docs/auth, /v3/api-docs # 뒤에 auth를 떼고 8081번으로 전달
 
         # 2. User Service
         - id: user-service
@@ -42,3 +55,14 @@ spring:
 jwt:
   # 반드시 Auth Service의 application.yml에 있는 값과 똑같은 문자열
   secret: my-super-secret-key-for-local-development-test-12345
+
+# 스웨거 통합 설정 추가
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html # 브라우저로 접속할 주소
+    urls:
+      # 우측 상단 드롭다운에 표시될 서비스 목록들
+      - name: Auth Service (인증 API)
+        url: /v3/api-docs/auth
+      - name: User Service (유저 API - 아직 서버 없음)
+        url: /v3/api-docs/user
