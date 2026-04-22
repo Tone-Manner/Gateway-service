@@ -10,17 +10,17 @@ spring:
         # Auth Service
         - id: auth-service
           # 기존 고정 주소 (현재 사용 중)
-          uri: http://localhost:8081
+          # uri: http://localhost:8081
 
-#          # [서버 늘린 후] Load Balancer 프로토콜 적용
-#          uri: lb://AUTH-SERVICE
-
+          # [서버 늘린 후] Load Balancer 프로토콜 적용
+          uri: lb://AUTH-SERVICE
           predicates:
             - Path=/api/v1/auth/**
 
         # Auth Service의 '스웨거 설명서 데이터'를 가져오기 위한 추가
         - id: auth-service-swagger
-          uri: http://localhost:8081
+          # uri: http://localhost:8081
+          uri: lb://AUTH-SERVICE
           predicates:
             - Path=/v3/api-docs/auth # 이 주소로 요청이 오면
           filters:
@@ -66,3 +66,8 @@ springdoc:
         url: /v3/api-docs/auth
       - name: User Service (유저 API - 아직 서버 없음)
         url: /v3/api-docs/user
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka # 유레카 서버의 주소
