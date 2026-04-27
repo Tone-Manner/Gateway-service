@@ -28,12 +28,20 @@ spring:
 
         # 2. User Service
         - id: user-service
-          uri: http://localhost:8082
+          uri: lb://USER-SERVICE
           predicates:
             - Path=/api/v1/users/**
           filters:
             # 방금 만든 JwtAuthenticationFilter의 앞부분 이름과 일치해야 해
             - JwtAuthenticationFilter
+
+        - id: user-service-swagger
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/v3/api-docs/user
+          filters:
+            # 게이트웨이로 /user가 붙어서 들어오면, 순수 /v3/api-docs로 유저 서버에 전달!
+            - RewritePath=/v3/api-docs/user, /v3/api-docs
 
       globalcors:
         cors-configurations:
