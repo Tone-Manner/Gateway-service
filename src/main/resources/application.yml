@@ -7,7 +7,7 @@ spring:
   cloud:
     gateway:
       routes:
-        # Auth Service
+        ####################### Auth Service #######################
         - id: auth-service
           # 기존 고정 주소 (현재 사용 중)
           # uri: http://localhost:8081
@@ -26,13 +26,13 @@ spring:
           filters:
               - RewritePath=/v3/api-docs/auth, /v3/api-docs # 뒤에 auth를 떼고 8081번으로 전달
 
-        # 2. User Service
+        ####################### User Service #######################
         - id: user-service
           uri: lb://USER-SERVICE
           predicates:
             - Path=/api/v1/users/**
           filters:
-            # 방금 만든 JwtAuthenticationFilter의 앞부분 이름과 일치해야 해
+            # 방금 만든 JwtAuthenticationFilter의 앞부분 이름과 일치
             - JwtAuthenticationFilter
 
         - id: user-service-swagger

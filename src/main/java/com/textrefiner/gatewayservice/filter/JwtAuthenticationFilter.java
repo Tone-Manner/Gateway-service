@@ -14,12 +14,22 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import javax.crypto.SecretKey;
+import java.util.List;
 
 @Slf4j
 @Component
 public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAuthenticationFilter.Config> {
 
     private final SecretKey secretKey;
+
+    private final List<String> excludedPaths = List.of(
+            "/api/v1/auth/login",
+            "/api/v1/auth/signup",
+            "/api/v1/users/test",   // 오늘 막혔던 테스트 API
+            "/api/v1/users/signup", // 내일 만들 회원가입 API
+            "/api/v1/users/login",  // 내일 만들 로그인 API
+            "/v3/api-docs"          // 스웨거 문서
+    );
 
     // application.yml에서 시크릿 키를 불러와서 암호화 키로 변환
     public JwtAuthenticationFilter(@Value("${jwt.secret}") String secret) {
@@ -36,6 +46,13 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
+            String path = request.getURI().getPath();
+
+            boolean isExcluded = excludedPaths.stream().anyMatch(path::startsWith);
+
+            if (isExcluded) {
+                return chain.filter(exchange);
+            }
 
             // 1. Authorization 헤더가 있는지 확인
             if (!request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
